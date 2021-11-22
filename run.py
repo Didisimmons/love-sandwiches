@@ -59,7 +59,7 @@ def update_sales_worksheet(data):
     """
     update sales worksheet, add new row with the list data provided
     """
-    print ("updating sales worksheet. \n")
+    print("updating sales worksheet. \n")
     sales_worksheet = SHEET.worksheet("sales") #using the gspread method to access the worksheets 
     sales_worksheet.append_row(data)
     print("Sales worksheet updated successfully.\n")
@@ -74,12 +74,17 @@ def calculate_surplus_data(sales_row):
     print("Calculating surplus data...\n")
     # from the gspread library get_all_values() to fetch all of the cells from our stock worksheet.
     stock = SHEET.worksheet("stock").get_all_values()
-    stock_row = stock[-1] #prints last row item 
-    print( stock_row)
+    stock_row = stock[-1]#prints last row item
 
+    """
+    The zip method allows us to iterate through two or more iterable data structures in a single loop
+    """
+    surplus_data = []
+    for stock, sales in zip(stock_row, sales_row):
+        surplus = int(stock) - sales
+        surplus_data.append(surplus)
 
-
-
+    return surplus_data
 
 
 
@@ -91,7 +96,8 @@ def main():
     #convert values to integers in order to be used in the spreadsheet 
     sales_data = [int(num) for num in data]
     update_sales_worksheet(sales_data)
-    calculate_surplus_data(sales_data)
+    new_sales_data = calculate_surplus_data(sales_data)
+    print(new_sales_data)
 
 
 print("Welcome to Love sandwiches data automation.\n")
