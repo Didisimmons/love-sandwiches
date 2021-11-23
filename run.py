@@ -55,24 +55,16 @@ def validate_data(values):
 
     return True
 
-def update_sales_worksheet(data):
-    """
-    update sales worksheet, add new row with the list data provided
-    """
-    print("updating sales worksheet. \n")
-    sales_worksheet = SHEET.worksheet("sales") #using the gspread method to access the worksheets 
-    sales_worksheet.append_row(data)
-    print("Sales worksheet updated successfully.\n")
 
-
-def update_surplus_data(data):
+def update_worksheet(data, worksheet):
     """
-    update surplus worksheet, add new row with the list data provided
+    Receives a list of integers to be inserted into a worksheet
+    Update the relevant worksheet with the data provided
     """
-    print("Updating surplus worksheet. \n")
-    surplus_worksheet = SHEET.worksheet("surplus") 
-    surplus_worksheet.append_row(data)
-    print("Surplus worksheet updated successfully.\n")
+    print(f"Updating {worksheet} worksheet...\n")
+    worksheet_to_update = SHEET.worksheet(worksheet)
+    worksheet_to_update.append_row(data)
+    print(f"{worksheet} worksheet updated successfully\n")
 
 
 def calculate_surplus_data(sales_row):
@@ -83,13 +75,9 @@ def calculate_surplus_data(sales_row):
     - Negative surplus indicates extra made when stock was sold out.
     """
     print("Calculating surplus data...\n")
-    # from the gspread library get_all_values() to fetch all of the cells from our stock worksheet.
     stock = SHEET.worksheet("stock").get_all_values()
-    stock_row = stock[-1]#prints last row item
-
-    """
-    The zip method allows us to iterate through two or more iterable data structures in a single loop
-    """
+    stock_row = stock[-1]
+    
     surplus_data = []
     for stock, sales in zip(stock_row, sales_row):
         surplus = int(stock) - sales
@@ -100,15 +88,14 @@ def calculate_surplus_data(sales_row):
 
 def main():
     """
-    run all program functions
+    Run all program functions
     """
     data = get_sales_data()
-    #convert values to integers in order to be used in the spreadsheet 
     sales_data = [int(num) for num in data]
-    update_sales_worksheet(sales_data)
-    new_sales_data = calculate_surplus_data(sales_data)
-    update_surplus_data(new_sales_data)
-    
+    update_worksheet(sales_data, "sales")
+    new_surplus_data = calculate_surplus_data(sales_data)
+    update_worksheet(new_surplus_data, "surplus")
 
-print("Welcome to Love sandwiches data automation.\n")
+
+print("Welcome to Love Sandwiches Data Automation")
 main()
